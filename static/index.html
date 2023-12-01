@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>/
+
+
+  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>향수 추천 챗봇 by OSME </title>
+    <!-- Bootstrap CSS 추가 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- 사용자 정의 스타일 -->
+    
+    
+    <!-- 로딩 메시지 -->
+<div id="loading-message" style="display: none; text-align: center;">
+  <p>로딩 중...</p>
+</div>
+
+<!-- 기존 코드... -->
+
+    
+    
+    <style>
+    
+    
+    
+  
+    
+    /* 헤더 제목의 스타일 수정 */
+    .header-title {
+      text-align: center; /* 가운데 정렬 */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+      border-radius: 10px; /* 모서리 둥글게 */
+      width: 62.5%; /* 원하는 너비로 조절 (예: 80%) */
+      margin: 0 auto; /* 가운데 정렬 */
+      padding: 20px; /* 내용 주변 여백 설정 */
+    }
+    
+    /* 부모 요소의 상단 여백 설정 */
+    .header-title {
+      margin-top: 20px; /* 상단 여백 설정 */
+    }
+
+    /* 선택적으로, 페이지의 배경색을 변경할 수 있습니다. */
+    body {
+        background-color: #f8f9fa; /* 밝은 회색 계열의 배경색 */
+    }
+    
+      
+      
+      body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+      .chat-container { max-width: 700px; margin: auto; margin-top: 50px; }
+      .chat-box { background: white; height: 400px; overflow-y: auto; padding: 15px; border-radius: 5px; border: 1px solid #e2e2e2; }
+      .chat-input { margin-top: 20px; }
+      .user-message { text-align: right; margin-bottom: 5px; }
+      .bot-message { text-align: left; margin-bottom: 5px; }
+      .message { padding: 5px 10px; display: inline-block; border-radius: 20px; }
+      .user-message .message { background-color: #007bff; color: white; }
+      .bot-message .message { background-color: #e2e2e2; }
+    
+    
+    
+    /* 작은버튼을 위한 스타일 */
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .button-row > button {
+      flex-basis: calc(50% - 10px); /* 버튼을 한 줄에 두 개씩 배치 */
+      margin: 5px;
+    }
+    
+    
+    
+</style>
+</head>
+<body> 
+
+<!-- 헤더 제목 -->
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="header-title bg-primary text-white p-3 rounded">
+      <h1>향수 추천 서비스 by 오스메</h1>
+    </div>
+  </div>
+</div>
+
+<!-- 채팅 컨테이너 -->
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="chat-container">
+      <div class="chat-box" id="chat-box"></div>
+      <div class="chat-input">
+        <input type="text" id="user-input" class="form-control" placeholder="당신이 원하는 향의 형용사를 입력하세요!">
+        <button onclick="sendMessage()" class="btn btn-primary btn-block mt-3">추천 받기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 작은 버튼들 -->
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="button-row mt-2">
+      <!-- 여기에 버튼들을 추가하세요 -->
+
+           <div class="button-row mt-2">
+              <button onclick="sendTemperature('시원한')" class="btn btn-primary btn-block">시원한</button>
+              <button onclick="sendTemperature('부드러운')" class="btn btn-secondary btn-block">부드러운</button>
+              <button onclick="sendTemperature('로맨틱한')" class="btn btn-success btn-block">로맨틱한</button>
+              <button onclick="sendTemperature('화려한')" class="btn btn-danger btn-block">화려한</button>
+            </div>
+  
+            <!-- 두 번째 줄의 버튼들 -->
+            <div class="button-row mt-1">
+              <button onclick="sendTemperature('따뜻한')" class="btn btn-warning btn-block">따뜻한</button>
+              <button onclick="sendTemperature('우아한')" class="btn btn-info btn-block">우아한</button>
+              <button onclick="sendTemperature('신비로운')" class="btn btn-dark btn-block">신비로운</button>
+              <button onclick="sendTemperature('차가운')" class="btn btn-light btn-block">차가운</button>
+            </div>
+    </div>
+  </div>
+</div>
+
+ 
+  
+
+
+
+<!-- JavaScript Bundle with Popper (Bootstrap에 필요한 JavaScript) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+
+
+        // 챗봇으로부터 메시지를 받아서 채팅 박스에 표시하는 함수
+        function addMessageToChatbox(message, isUser) {
+          var chatBox = document.getElementById('chat-box');
+          var messageDiv = document.createElement('div');
+          messageDiv.innerHTML = `<span class="message">${message}</span>`;
+          messageDiv.className = isUser ? 'user-message' : 'bot-message';
+          chatBox.appendChild(messageDiv);
+          chatBox.scrollTop = chatBox.scrollHeight; // 항상 최신 메시지가 보이도록 스크롤
+      }
+
+      // 이미지를 채팅 박스에 추가하는 함수
+      function addImageToChatbox(imageUrl) {
+          var chatBox = document.getElementById('chat-box');
+          var imageDiv = document.createElement('div');
+          imageDiv.innerHTML = `<img src="${imageUrl}" alt="Generated Image" style="max-width:100%;height:auto;">`;
+          chatBox.appendChild(imageDiv);
+          chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      function sendMessage() {
+    var userInput = document.getElementById('user-input');
+    var message = userInput.value.trim();
+    if(message === '') return; // 입력이 없으면 아무것도 하지 않음
+
+    addMessageToChatbox(message, true); // 챗박스에 사용자 메시지 추가
+
+    // 로딩 메시지 표시
+    document.getElementById('loading-message').style.display = 'block';
+
+    fetch('/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: message }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // 로딩 메시지 숨김
+        document.getElementById('loading-message').style.display = 'none';
+
+        addMessageToChatbox(data.message, false); // 챗박스에 챗봇 응답 추가
+        if (data.image_url) {
+            addImageToChatbox(data.image_url); // 챗박스에 이미지 추가
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        addMessageToChatbox('죄송합니다, 오류가 발생했습니다.', false);
+
+        // 로딩 메시지 숨김
+        document.getElementById('loading-message').style.display = 'none';
+    });
+
+    userInput.value = ''; // 입력 필드 초기화
+}
+
+
+      // ... 나머지 함수들 ...
+
+// 시원한 버튼을 클릭할 때 실행되는 함수
+function sendTemperature(temperature) {
+  var userInput = document.getElementById('user-input');
+  userInput.value = temperature; // 입력 필드에 "시원한" 설정
+
+  // "추천 받기" 버튼 클릭
+  var recommendButton = document.querySelector('.chat-input button');
+  recommendButton.click();
+}
+
+
+</script>
+</body>
+</html>
